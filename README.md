@@ -1,7 +1,7 @@
 asck - ArchivesSpace Data Checker plugin
 ========================================
 
-This plugin checks the data in an ArchivesSpace instance.
+This plugin introduces a new background job that checks the data in an ArchivesSpace instance.
 It reports on the number of records found and how many are invalid or throw errors.
 
 ## Getting Started
