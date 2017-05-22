@@ -66,7 +66,8 @@ class ASpaceCheckRunner < JobRunner
 
     log("--")
     @end_time = Time.now
-    log("Ended at: " + @end_time.to_s)
+    log("Started at:   " + @start_time.to_s)
+    log("Ended at:     " + @end_time.to_s)
     log("Elapsed time: #{(@end_time - @start_time + 0.5).to_i}s")
 
     self.success! unless self.canceled?
