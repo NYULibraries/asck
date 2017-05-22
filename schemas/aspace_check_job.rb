@@ -5,7 +5,7 @@
     "type" => "object",
 
     "properties" => {
-      
+      "skip_validation" => {"type" => "boolean", "default" => "false"}
     }
   }
 }

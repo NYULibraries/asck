@@ -22,8 +22,15 @@ class ASpaceCheckRunner < JobRunner
     @invalid_count = 0
     @error_count = 0
 
-    log("asck - ArchivesSpace Data Checker")
-    log("---------------------------------")
+    @start_time = Time.now
+
+    log("--------------------------")
+    log("ArchivesSpace Data Checker")
+    log("--------------------------")
+    log("Started at: " + @start_time.to_s)
+    log("Database: " + AppConfig[:db_url].sub(/\?.*/, ''))
+    log("Skipping validations") if @json.job['skip_validation']
+    log("--")
 
     # globals first
     log("Global:")
@@ -49,8 +56,19 @@ class ASpaceCheckRunner < JobRunner
       log("Check complete.")
     end
     log("#{@total_count} record#{@total_count == 1 ? '' : 's'} found in #{Repository.count} repositories.")
-    log("#{@invalid_count} record#{@invalid_count == 1 ? '' : 's'} are invalid.")
-    log("#{@error_count} record#{@error_count == 1 ? '' : 's'} errored.")
+
+    if @json.job['skip_validation']
+      log("Records were not validated.")
+    else
+      log("#{@invalid_count} record#{@invalid_count == 1 ? '' : 's'} are invalid.")
+      log("#{@error_count} record#{@error_count == 1 ? '' : 's'} errored.")
+    end
+
+    log("--")
+    @end_time = Time.now
+    log("Ended at: " + @end_time.to_s)
+    log("Elapsed time: #{(@end_time - @start_time + 0.5).to_i}s")
+
     self.success! unless self.canceled?
   end
 
@@ -83,16 +101,18 @@ class ASpaceCheckRunner < JobRunner
     @total_count += ds.count
     log("#{model}: #{ds.count}")
 
-    ds.each do |record|
-      break if self.canceled?
-      begin
-        json = model.to_jsonmodel(record[:id])
-      rescue JSONModel::ValidationException => e
-        @invalid_count += 1
-        log("  * Invalid record: #{model} #{record[:id]} -- #{e}")
-      rescue => e
-        @error_count += 1
-        log("  * Record errored: #{model} #{record[:id]} -- #{e}")
+    unless @json.job['skip_validation']
+      ds.each do |record|
+        break if self.canceled?
+        begin
+          json = model.to_jsonmodel(record[:id])
+        rescue JSONModel::ValidationException => e
+          @invalid_count += 1
+          log("  * Invalid record: #{model} #{record[:id]} -- #{e}")
+        rescue => e
+          @error_count += 1
+          log("  * Record errored: #{model} #{record[:id]} -- #{e}")
+        end
       end
     end
   end
