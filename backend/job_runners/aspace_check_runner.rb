@@ -20,6 +20,7 @@ class ASpaceCheckRunner < JobRunner
 
     @total_count = 0
     @invalid_count = 0
+    @no_index_count = 0
     @error_count = 0
 
     @start_time = Time.now
@@ -61,6 +62,7 @@ class ASpaceCheckRunner < JobRunner
       log("Records were not validated.")
     else
       log("#{@invalid_count} record#{@invalid_count == 1 ? '' : 's'} are invalid.")
+      log("#{@no_index_count} record#{@no_index_count == 1 ? '' : 's'} records were not found in the search index.")
       log("#{@error_count} record#{@error_count == 1 ? '' : 's'} errored.")
     end
 
@@ -98,24 +100,54 @@ class ASpaceCheckRunner < JobRunner
 
   def check_records(model, ds = nil)
     ds ||= model
-
-    @total_count += ds.count
-    log("#{model}: #{ds.count}")
+    @model_count = ds.count
+    @total_count += @model_count
+    log("#{model}: #{@model_count}")
 
     unless @json.job['skip_validation']
       ds.each do |record|
         break if self.canceled?
         begin
           json = model.to_jsonmodel(record[:id])
+
+          if index_for_model(model, json) && json.uri
+            records = Search.records_for_uris(Array(json.uri))
+            if records['total_hits'] == 0
+              @no_index_count += 1
+              log("  * Record not found in index: #{json.uri}")
+            end
+          end
+
         rescue JSONModel::ValidationException => e
           @invalid_count += 1
           log("  * Invalid record: #{model} #{record[:id]} -- #{e}")
         rescue => e
           @error_count += 1
           log("  * Record errored: #{model} #{record[:id]} -- #{e}")
+          Log.debug("#{$!}  #{$@}")
         end
       end
     end
+  end
+
+
+  def index_for_model(model, json)
+    @index_for_model ||= {}
+
+    type = json.class.record_type
+
+    unless @index_for_model.has_key?(type)
+      results = Search.search({:type => type, :page => 1, :page_size => 1}, model.active_repository)
+      @index_for_model[type] = results['total_hits'] > 0 ? results['total_hits'] : false
+      if @index_for_model[type]
+        log("  indexed: #{@index_for_model[type]}")
+        if @index_for_model[type] != @model_count
+          log("    * Database and index counts differ")
+        end
+      end
+    end
+
+    @index_for_model[type]
   end
 
 
