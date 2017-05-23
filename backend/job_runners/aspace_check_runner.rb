@@ -103,7 +103,9 @@ class ASpaceCheckRunner < JobRunner
     @model_count = ds.count
     @total_count += @model_count
 
-    unless @json.job['skip_validation']
+    if @json.job['skip_validation']
+      log("#{model}: #{@model_count}") if @model_count > 0
+    else
       no_index_for_model = 0
       ds.each do |record|
         break if self.canceled?
