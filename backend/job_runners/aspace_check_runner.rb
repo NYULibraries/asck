@@ -62,7 +62,7 @@ class ASpaceCheckRunner < JobRunner
       log("Records were not validated.")
     else
       log("#{@invalid_count} record#{@invalid_count == 1 ? '' : 's'} are invalid.")
-      log("#{@no_index_count} record#{@no_index_count == 1 ? '' : 's'} records were not found in the search index.")
+      log("#{@no_index_count} record#{@no_index_count == 1 ? '' : 's'} were not found in the search index.")
       log("#{@error_count} record#{@error_count == 1 ? '' : 's'} errored.")
     end
 
