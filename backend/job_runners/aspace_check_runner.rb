@@ -104,6 +104,7 @@ class ASpaceCheckRunner < JobRunner
     @total_count += @model_count
 
     unless @json.job['skip_validation']
+      no_index_for_model = 0
       ds.each do |record|
         break if self.canceled?
         begin
@@ -113,7 +114,12 @@ class ASpaceCheckRunner < JobRunner
             records = Search.records_for_uris(Array(json.uri))
             if records['total_hits'] == 0
               @no_index_count += 1
-              log_error("Record not found in index: #{json.uri}")
+              no_index_for_model += 1
+              if no_index_for_model <= 5
+                log_error("Record not found in index: #{json.uri}")
+              elsif no_index_for_model == 6
+                log_error("... more unindexed records not shown")
+              end
             end
           end
 
