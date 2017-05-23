@@ -1,0 +1,8 @@
+en:
+  aspace_check_job:
+    _singular: Data checker job
+    _plural: Data checker jobs
+    skip_validation: Skip validation?
+  job:
+    types:
+      aspace_check_job: Data Checker Job
