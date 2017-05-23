@@ -102,7 +102,6 @@ class ASpaceCheckRunner < JobRunner
     ds ||= model
     @model_count = ds.count
     @total_count += @model_count
-    log("#{model}: #{@model_count}")
 
     unless @json.job['skip_validation']
       ds.each do |record|
@@ -114,17 +113,16 @@ class ASpaceCheckRunner < JobRunner
             records = Search.records_for_uris(Array(json.uri))
             if records['total_hits'] == 0
               @no_index_count += 1
-              log("  * Record not found in index: #{json.uri}")
+              log_error("Record not found in index: #{json.uri}")
             end
           end
 
         rescue JSONModel::ValidationException => e
           @invalid_count += 1
-          log("  * Invalid record: #{model} #{record[:id]} -- #{e}")
+          log_error("Invalid record: #{model} #{record[:id]} -- #{e}")
         rescue => e
           @error_count += 1
-          log("  * Record errored: #{model} #{record[:id]} -- #{e}")
-          Log.debug("#{$!}  #{$@}")
+          log_error("Record errored: #{model} #{record[:id]} -- #{e}", e)
         end
       end
     end
@@ -140,10 +138,12 @@ class ASpaceCheckRunner < JobRunner
       results = Search.search({:type => type, :page => 1, :page_size => 1}, model.active_repository)
       @index_for_model[type] = results['total_hits'] > 0 ? results['total_hits'] : false
       if @index_for_model[type]
-        log("  indexed: #{@index_for_model[type]}")
+        log("#{model}: #{@model_count} #")
         if @index_for_model[type] != @model_count
-          log("    * Database and index counts differ")
+          log_error("Index count incorrect: #{@index_for_model[type]}")
         end
+      else
+        log("#{model}: #{@model_count}")
       end
     end
 
@@ -156,4 +156,9 @@ class ASpaceCheckRunner < JobRunner
     @job.write_output(s)
   end
 
+
+  def log_error(s, e = nil)
+    log("  *** #{s}")
+    Log.debug(e.backtrace.join("\n")) if e
+  end
 end
