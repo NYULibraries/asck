@@ -133,21 +133,22 @@ class ASpaceCheckRunner < JobRunner
     @index_for_model ||= {}
 
     type = json.class.record_type
+    key = "#{model.active_repository}__#{type}"
 
-    unless @index_for_model.has_key?(type)
+    unless @index_for_model.has_key?(key)
       results = Search.search({:type => type, :page => 1, :page_size => 1}, model.active_repository)
-      @index_for_model[type] = results['total_hits'] > 0 ? results['total_hits'] : false
-      if @index_for_model[type]
+      @index_for_model[key] = results['total_hits'] > 0 ? results['total_hits'] : false
+      if @index_for_model[key]
         log("#{model}: #{@model_count} #")
-        if @index_for_model[type] != @model_count
-          log_error("Index count incorrect: #{@index_for_model[type]}")
+        if @index_for_model[key] != @model_count
+          log_error("Index count incorrect: #{@index_for_model[key]}")
         end
       else
         log("#{model}: #{@model_count}")
       end
     end
 
-    @index_for_model[type]
+    @index_for_model[key]
   end
 
 
