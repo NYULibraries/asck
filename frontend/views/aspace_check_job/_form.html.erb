@@ -1,22 +1,5 @@
 <%
-
-  # hard-coding for now
-
-  models = %w(ASDate Accession AgentContact AgentCorporateEntity AgentFamily
-              AgentPerson AgentSoftware ArchivalObject Assessment Classification
-              ClassificationTerm CollectionManagement ContainerLocation
-              ContainerProfile Deaccession DefaultValues DigitalObject
-              DigitalObjectComponent Enumeration EnumerationValue Event Extent
-              ExternalDocument ExternalId FileVersion Group Instance Job Location
-              LocationFunction LocationProfile NameCorporateEntity NameFamily
-              NamePerson NameSoftware NoteBibliography NoteDigitalObject NoteIndex
-              NoteIndexItem NoteMultipart NoteOrderedlist NoteSinglepart Permission
-              Preference RdeTemplate Repository Resource RevisionStatement
-              RightsStatement RightsStatementAct RightsStatementExternalDocument
-              SubContainer Subject Telephone Term TopContainer User UserDefined
-              Vocabulary)
-
-  columns = 4
+  columns = 3
 %>
 
 <div class="row">
@@ -37,7 +20,7 @@
 
 <div class="row">
 
-<% models.each_slice((models.length/columns.to_f).ceil) do |models_slice| %>
+<% models_to_check.each_slice((models_to_check.length/columns.to_f).ceil) do |models_slice| %>
   <div class="col-md-<%= 12/columns  %>">
     <% models_slice.each do |model| %>
       <div class="form-group">
