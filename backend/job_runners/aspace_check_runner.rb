@@ -129,7 +129,7 @@ class ASpaceCheckRunner < JobRunner
     @total_count += @model_count
 
     if @json.job['skip_validation']
-      log("#{model}: #{@model_count}") if @model_count > 0
+      index_for_model(model, model.to_jsonmodel(ds.first[:id])) if @model_count > 0
     else
       no_index_for_model = 0
       ds.each do |record|
