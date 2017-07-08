@@ -18,6 +18,7 @@ class ASpaceCheckRunner < JobRunner
     #
     # This is annoying, but what are you going to do?
 
+    @models = []
     @total_count = 0
     @invalid_count = 0
     @no_index_count = 0
@@ -31,6 +32,30 @@ class ASpaceCheckRunner < JobRunner
     log("Started at: " + @start_time.to_s)
     log("Database: " + AppConfig[:db_url].sub(/\?.*/, ''))
     log("Skipping validations") if @json.job['skip_validation']
+    if @json.job['models'].empty?
+      log("Checking all models")
+      @models = ASModel.all_models
+    else
+      log("Checking models: " + @json.job['models'].join(' '))
+      bad_models = []
+      @json.job['models'].each do |name|
+        begin
+          model = Object.const_get(name)
+          if model.included_modules.include?(ASModel)
+            @models << model
+          else
+            bad_models << name
+          end
+        rescue NameError => e
+          bad_models << e.to_s.split.last
+        end
+      end
+      unless bad_models.empty?
+        log_error("Some models are not ASModels: " + bad_models.join(' '))
+        log_error("Aborting ...")
+        return
+      end
+    end
     log("--")
 
     # globals first
@@ -79,7 +104,7 @@ class ASpaceCheckRunner < JobRunner
   def check_models(opts = {})
     global = opts.fetch(:global, false)
 
-    ASModel.all_models.each do |model|
+    @models.each do |model|
       break if self.canceled?
 
       next unless model.has_jsonmodel?
