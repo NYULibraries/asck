@@ -56,6 +56,7 @@ class ASpaceCheckRunner < JobRunner
         return
       end
     end
+    log("Indexed models marked with #")
     log("--")
 
     # globals first
