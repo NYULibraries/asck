@@ -15,4 +15,4 @@ en:
                  To check only a subset, select the subset of models below.
   job:
     types:
-      aspace_check_job: Data Checker Job
+      aspace_check_job: Check Data
