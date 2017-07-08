@@ -5,6 +5,6 @@
     .permissions([])
     .returns([200, "A list of models"]) \
   do
-     json_response(ASModel.all_models.select{|m| m.has_jsonmodel?}.sort_by(&:name))
+     json_response(ASModel.all_models.select{|m| m.has_jsonmodel?}.map(&:name).sort)
   end
 end
