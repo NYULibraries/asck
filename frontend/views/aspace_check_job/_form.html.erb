@@ -1,1 +1,58 @@
+<%
+
+  # hard-coding for now
+
+  models = %w(ASDate Accession AgentContact AgentCorporateEntity AgentFamily
+              AgentPerson AgentSoftware ArchivalObject Assessment Classification
+              ClassificationTerm CollectionManagement ContainerLocation
+              ContainerProfile Deaccession DefaultValues DigitalObject
+              DigitalObjectComponent Enumeration EnumerationValue Event Extent
+              ExternalDocument ExternalId FileVersion Group Instance Job Location
+              LocationFunction LocationProfile NameCorporateEntity NameFamily
+              NamePerson NameSoftware NoteBibliography NoteDigitalObject NoteIndex
+              NoteIndexItem NoteMultipart NoteOrderedlist NoteSinglepart Permission
+              Preference RdeTemplate Repository Resource RevisionStatement
+              RightsStatement RightsStatementAct RightsStatementExternalDocument
+              SubContainer Subject Telephone Term TopContainer User UserDefined
+              Vocabulary)
+
+  columns = 4
+%>
+
+<div class="row">
+  <div class="col-md-6">
+    <h4><%= I18n.t('aspace_check_job.validation_section') %></h4>
+    <%= I18n.t('aspace_check_job.validation_help') %>
+  </div>
+</div>
+
 <%= form.label_and_boolean "skip_validation" %>
+
+<div class="row">
+  <div class="col-md-6">
+    <h4>Models</h4>
+    <%= I18n.t('aspace_check_job.models_help') %>
+  </div>
+</div>
+
+<div class="row">
+
+<% models.each_slice((models.length/columns.to_f).ceil) do |models_slice| %>
+  <div class="col-md-<%= 12/columns  %>">
+    <% models_slice.each do |model| %>
+      <div class="form-group">
+        <div class="col-sm-1 checkbox">
+          <%= form.checkbox("models[]", {:value => model}, false) %>
+        </div>
+        <label class="col-sm-4 control-label"
+               style="text-align:left"
+               for="aspace_check_job_models[]_"
+               col_size="4">
+          <%= model %>
+        </label> 
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+</div>

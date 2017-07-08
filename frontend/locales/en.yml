@@ -3,6 +3,16 @@ en:
     _singular: Data checker job
     _plural: Data checker jobs
     skip_validation: Skip validation?
+    models: Models
+    all_models: All
+    validation_section: Validation
+    validation_help: By default each record will be validated.
+                     This can take some time on large datasets.
+                     Check this to skip validations and only get
+                     a count of records for each model.
+    models_section: Models
+    models_help: By default all models will be checked.
+                 To check only a subset, select the subset of models below.
   job:
     types:
       aspace_check_job: Data Checker Job
