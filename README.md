@@ -1,6 +1,6 @@
 # Note:
 
-The Purpose of this fork is to ensure stability in the NYULibraries archivesspace implementation while the upstream library at https://github.com/hudmol/asck is in an unstable state. If you have issues or would like to use the asck plugin please refer upstream.
+The Purpose of this fork is to ensure stability in the NYULibraries archivesspace implementation while the upstream library at https://github.com/hudmol/asck is in an unstable state. If you would like to open an issue, or use the asck plugin, please refer upstream.
 
 This fork will be left as-is for now, to maintain functionality between asck and archivesspace 2.3.x.*
 **
